@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/factory-predictive-maintenance-v1/static/css/main.d0bec5a7.css",
-    "main.js": "/factory-predictive-maintenance-v1/static/js/main.8e14f314.js",
+    "main.js": "/factory-predictive-maintenance-v1/static/js/main.660dddeb.js",
     "static/js/453.a4c4aa0d.chunk.js": "/factory-predictive-maintenance-v1/static/js/453.a4c4aa0d.chunk.js",
     "static/media/Thai_Summit_Group_Logo.svg.png": "/factory-predictive-maintenance-v1/static/media/Thai_Summit_Group_Logo.svg.666a4b4a49fc32cde454.png",
     "index.html": "/factory-predictive-maintenance-v1/index.html",
     "main.d0bec5a7.css.map": "/factory-predictive-maintenance-v1/static/css/main.d0bec5a7.css.map",
-    "main.8e14f314.js.map": "/factory-predictive-maintenance-v1/static/js/main.8e14f314.js.map",
+    "main.660dddeb.js.map": "/factory-predictive-maintenance-v1/static/js/main.660dddeb.js.map",
     "453.a4c4aa0d.chunk.js.map": "/factory-predictive-maintenance-v1/static/js/453.a4c4aa0d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.d0bec5a7.css",
-    "static/js/main.8e14f314.js"
+    "static/js/main.660dddeb.js"
   ]
 }
