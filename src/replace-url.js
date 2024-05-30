@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const oldUrl = 'http://35.192.124.70:8081/kafka-data';
-const newUrl = 'http://34.29.252.137:8081/kafka-data';
+const newUrl = 'https://harveypredictive.work.gd:8081/kafka-data/';
 
 const buildDir = path.join(__dirname, 'build/static/js');
 

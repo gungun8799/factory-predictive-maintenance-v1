@@ -33,7 +33,7 @@ const RealTimeUpdate = () => {
 
   useEffect(() => {
     const fetchKafkaData = () => {
-      fetch('http://34.29.252.137:8081/kafka-data')
+      fetch('https://harveypredictive.work.gd:8081/kafka-data/')
         .then(response => response.json())
         .then(data => {
           console.log('Fetched data:', data);

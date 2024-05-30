@@ -13,7 +13,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      fetch('http://34.29.252.137:8080/data')
+      fetch('https://harveypredictive.work.gd:8080/data/')
         .then(response => response.json())
         .then(data => {
           console.log('Fetched data from Postgres:', data); // Log fetched data from Postgres
@@ -30,7 +30,7 @@ const Dashboard = () => {
     };
 
     const fetchKafkaData = () => {
-      fetch('http://34.29.252.137:8081/kafka-data')
+      fetch('https://harveypredictive.work.gd:8081/kafka-data/')
         .then(response => response.json())
         .then(data => {
           console.log('Fetched Kafka data:', data); // Log fetched Kafka data

@@ -9,8 +9,10 @@ import OperatingEnvironment from './components/OperatingEnvironment/OperatingEnv
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
+  const basename = process.env.NODE_ENV === 'development' ? '/' : '/factory-predictive-maintenance-v1';
+
   return (
-    <Router>
+    <Router basename={basename}>
       <div className="App">
         <Sidebar />
         <div className="content">
@@ -20,8 +22,7 @@ function App() {
             <Route path="/RealTimeUpdate" element={<RealTimeUpdate />} />
             <Route path="/EquipmentConditionDetail" element={<EquipmentConditionDetail />} />
             <Route path="/OperatingEnvironment" element={<OperatingEnvironment />} />
-
-           </Routes>
+          </Routes>
         </div>
       </div>
     </Router>

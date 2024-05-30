@@ -12,7 +12,7 @@ const FactoryLayout = () => {
   const localStorageKey = 'statusLights';
 
   const fetchData = () => {
-    fetch('http://34.29.252.137:8080/data')
+    fetch('https://34.29.252.137:8080/data')
       .then(response => response.json())
       .then(data => {
         console.log('Fetched data from Postgres:', data); // Log fetched data from Postgres

@@ -39,11 +39,7 @@ const Sidebar = () => {
           <ListItemIcon><ListAltIcon /></ListItemIcon>
           <ListItemText primary="Operation Status" />
         </ListItem>
-       
-        <ListItem button component={Link} to="/ai-feature" className={currentPath === '/ai-feature' ? 'selected' : ''}>
-          <ListItemIcon><AccountCircleIcon /></ListItemIcon>
-          <ListItemText primary="AI Features" />
-        </ListItem>
+
       </List>
     </div>
   );

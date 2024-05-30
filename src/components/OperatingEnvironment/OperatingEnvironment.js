@@ -201,7 +201,7 @@ const OperatingEnvironment = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://34.29.252.137:8080/data');
+        const response = await fetch('https://harveypredictive.work.gd:8080/data/');
         const result = await response.json();
         if (result.status === 'success' && Array.isArray(result.data)) {
           processData(result.data);

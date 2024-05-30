@@ -11,7 +11,7 @@ const RealTime = () => {
 
   useEffect(() => {
     const fetchKafkaData = () => {
-      fetch('http://34.29.252.137:8081/kafka-data?limit=10')
+      fetch('https://harveypredictive.work.gd:8081/kafka-data/?limit=10')
         .then(response => response.json())
         .then(data => {
           if (data.status === 'success') {

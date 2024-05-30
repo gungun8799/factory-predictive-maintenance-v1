@@ -7,7 +7,7 @@ const EquipmentConditionDetail = () => {
   const [filter, setFilter] = useState('');
 
   const fetchData = () => {
-    fetch('http://34.29.252.137:8080/data')
+    fetch('https://harveypredictive.work.gd:8080/data/')
       .then(response => response.json())
       .then(data => {
         console.log('Fetched data from Postgres:', data);
