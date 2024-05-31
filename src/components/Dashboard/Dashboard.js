@@ -47,7 +47,7 @@ const Dashboard = () => {
     const intervalId = setInterval(() => {
       fetchData();
       fetchKafkaData();
-    }, 10000); // Fetch every 1 hour
+    }, 300000); // Fetch every 1 hour
 
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, []);

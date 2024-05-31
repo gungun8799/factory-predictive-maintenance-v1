@@ -14,17 +14,18 @@ import styles from './OperatingEnvironment.module.css'; // Import CSS module
 import { format, subMinutes, subHours, subDays, subWeeks, subMonths, isValid } from 'date-fns';
 
 const formatData = (data, displayOption) => {
+  const now = new Date();
   switch (displayOption) {
     case 'minute':
-      return data.filter((entry) => new Date(entry.timestamp) >= subMinutes(new Date(), 60));
+      return data.filter((entry) => new Date(entry.timestamp) >= subMinutes(now, 60));
     case 'hourly':
-      return data.filter((entry) => new Date(entry.timestamp) >= subHours(new Date(), 24));
+      return data.filter((entry) => new Date(entry.timestamp) >= subHours(now, 24));
     case 'daily':
-      return data.filter((entry) => new Date(entry.timestamp) >= subDays(new Date(), 7));
+      return data.filter((entry) => new Date(entry.timestamp) >= subDays(now, 7));
     case 'weekly':
-      return data.filter((entry) => new Date(entry.timestamp) >= subWeeks(new Date(), 4));
+      return data.filter((entry) => new Date(entry.timestamp) >= subWeeks(now, 4));
     case 'monthly':
-      return data.filter((entry) => new Date(entry.timestamp) >= subMonths(new Date(), 12));
+      return data.filter((entry) => new Date(entry.timestamp) >= subMonths(now, 12));
     default:
       return data;
   }
@@ -67,8 +68,8 @@ const MachineChart = ({ machineName, data, filters, onFilterChange, displayOptio
   };
 
   return (
-    <div className={styles['machine-chart-wrapper-2']}>
-      <div className={styles['filter-container-2']}>
+    <div className={styles['machine-chart-wrapper']}>
+      <div className={styles['filter-container']}>
         <label>
           Start Date:
           <input
@@ -216,19 +217,11 @@ const OperatingEnvironment = () => {
     const processData = (data) => {
       const processedData = data.map(item => ({
         ...item,
-        timestamp: new Date(item.timestamp).toLocaleString('en-US', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: false,
-        }),
+        timestamp: new Date(item.timestamp).toISOString(), // Use ISO string for timestamp
       }));
 
       setChartData((prevChartData) => {
-        const updatedData = [...prevChartData, ...processedData];
+        const updatedData = [...processedData];
         localStorage.setItem('chartData', JSON.stringify(updatedData));
         return updatedData;
       });
@@ -240,46 +233,17 @@ const OperatingEnvironment = () => {
   return (
     <div className={styles['operating-environment']}>
       <h3 className={styles['matrix-heading']}>Operating Environment by Machine</h3>
-      <MachineChart
-        machineName="Machine_1"
-        data={chartData}
-        filters={filters.Machine_1}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_1}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
-      <MachineChart
-        machineName="Machine_2"
-        data={chartData}
-        filters={filters.Machine_2}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_2}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
-      <MachineChart
-        machineName="Machine_3"
-        data={chartData}
-        filters={filters.Machine_3}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_3}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
-      <MachineChart
-        machineName="Machine_4"
-        data={chartData}
-        filters={filters.Machine_4}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_4}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
-      <MachineChart
-        machineName="Machine_5"
-        data={chartData}
-        filters={filters.Machine_5}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_5}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
+      {['Machine_1', 'Machine_2', 'Machine_3', 'Machine_4', 'Machine_5'].map((machine) => (
+        <MachineChart
+          key={machine}
+          machineName={machine}
+          data={chartData}
+          filters={filters[machine]}
+          onFilterChange={handleFilterChange}
+          displayOption={displayOptions[machine]}
+          onDisplayOptionChange={handleDisplayOptionChange}
+        />
+      ))}
     </div>
   );
 };
