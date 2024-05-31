@@ -78,7 +78,7 @@ const FactoryLayout = () => {
     scene.add(hemiLight);
 
     const loader = new GLTFLoader();
-    loader.load('https://gungun8799.github.io/factory-predictive-maintenance-v1/public/assets/4_predictive-maintenance-model.glb', (gltf) => {
+    loader.load('https://gungun8799.github.io/factory-predictive-maintenance-v1/assets/4_predictive-maintenance-model.glb', (gltf) => {
       const model = gltf.scene;
 
       // Add status lights with specific positions
