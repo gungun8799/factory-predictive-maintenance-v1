@@ -46,7 +46,10 @@ const RealTimeUpdate = () => {
                 machine: payload.machine,
                 equipment: payload.equipment,
                 operational_status: payload.operational_status,
-                good_count: payload.good_count.toFixed(2), // Adjusting to 2 decimal places
+                vibration: payload.vibration.toFixed(2), // Adjusting to 2 decimal places
+                temperature: payload.temperature.toFixed(2), // Adjusting to 2 decimal places
+                noise_frequency: payload.noise_frequency.toFixed(2), // Adjusting to 2 decimal places
+                good_count: payload.good_count,
                 cycle_time: payload.cycle_time.toFixed(2), // Adjusting to 2 decimal places
                 performance: payload.performance.toFixed(2), // Adjusting to 2 decimal places
                 oee: payload.oee.toFixed(2), // Adjusting to 2 decimal places
@@ -124,6 +127,9 @@ const RealTimeUpdate = () => {
               performance={card.performance}
               oee={card.oee}
               lastUpdate={lastUpdate} // Pass last update time to Card component
+              vibration={card.vibration}
+              temperature={card.temperature}
+              noise_frequency={card.noise_frequency}
             />
           ))}
         </div>
