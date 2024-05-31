@@ -14,24 +14,63 @@ import styles from './OperatingEnvironment.module.css'; // Import CSS module
 import { format, subMinutes, subHours, subDays, subWeeks, subMonths, isValid } from 'date-fns';
 
 const formatData = (data, displayOption) => {
-  const now = new Date();
   switch (displayOption) {
     case 'minute':
-      return data.filter((entry) => new Date(entry.timestamp) >= subMinutes(now, 60));
+      return data.filter((entry) => new Date(entry.timestamp) >= subMinutes(new Date(), 60));
     case 'hourly':
-      return data.filter((entry) => new Date(entry.timestamp) >= subHours(now, 24));
+      return data.filter((entry) => new Date(entry.timestamp) >= subHours(new Date(), 24));
     case 'daily':
-      return data.filter((entry) => new Date(entry.timestamp) >= subDays(now, 7));
+      return data.filter((entry) => new Date(entry.timestamp) >= subDays(new Date(), 7));
     case 'weekly':
-      return data.filter((entry) => new Date(entry.timestamp) >= subWeeks(now, 4));
+      return data.filter((entry) => new Date(entry.timestamp) >= subWeeks(new Date(), 4));
     case 'monthly':
-      return data.filter((entry) => new Date(entry.timestamp) >= subMonths(now, 12));
+      return data.filter((entry) => new Date(entry.timestamp) >= subMonths(new Date(), 12));
     default:
       return data;
   }
 };
 
-const MachineChart = ({ machineName, data, filters, onFilterChange, displayOption, onDisplayOptionChange }) => {
+const MachineChart = ({ machineName, filters, onFilterChange, displayOption, onDisplayOptionChange }) => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`https://harveypredictive.work.gd:8080/data/${machineName}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        if (result.status === 'success' && Array.isArray(result.data)) {
+          processData(result.data);
+        } else {
+          console.error('Error: Data fetched is not an array or status is not success:', result);
+        }
+      } catch (error) {
+        console.error('Error fetching data from Postgres:', error);
+      }
+    };
+
+    const processData = (data) => {
+      const processedData = data.map(item => ({
+        ...item,
+        timestamp: new Date(item.timestamp).toLocaleString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+        }),
+      }));
+
+      setData(processedData);
+    };
+
+    fetchData();
+  }, [machineName]);
+
   const filterData = () => {
     const { startDate, endDate } = filters;
     let filteredData = data.filter((entry) => {
@@ -39,7 +78,7 @@ const MachineChart = ({ machineName, data, filters, onFilterChange, displayOptio
       const startTime = startDate ? new Date(startDate).getTime() : null;
       const endTime = endDate ? new Date(endDate).getTime() : null;
 
-      return entry.machine === machineName && (!startTime || entryTime >= startTime) && (!endTime || entryTime <= endTime);
+      return (!startTime || entryTime >= startTime) && (!endTime || entryTime <= endTime);
     });
 
     return formatData(filteredData, displayOption);
@@ -68,8 +107,8 @@ const MachineChart = ({ machineName, data, filters, onFilterChange, displayOptio
   };
 
   return (
-    <div className={styles['machine-chart-wrapper']}>
-      <div className={styles['filter-container']}>
+    <div className={styles['machine-chart-wrapper-2']}>
+      <div className={styles['filter-container-2']}>
         <label>
           Start Date:
           <input
@@ -147,11 +186,6 @@ const MachineChart = ({ machineName, data, filters, onFilterChange, displayOptio
 };
 
 const OperatingEnvironment = () => {
-  const [chartData, setChartData] = useState(() => {
-    const savedData = localStorage.getItem('chartData');
-    return savedData ? JSON.parse(savedData) : [];
-  });
-
   const [filters, setFilters] = useState(() => {
     const savedFilters = localStorage.getItem('filters');
     return savedFilters ? JSON.parse(savedFilters) : {
@@ -199,51 +233,44 @@ const OperatingEnvironment = () => {
     });
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('https://harveypredictive.work.gd:8080/data/');
-        const result = await response.json();
-        if (result.status === 'success' && Array.isArray(result.data)) {
-          processData(result.data);
-        } else {
-          console.error('Error: Data fetched is not an array:', result);
-        }
-      } catch (error) {
-        console.error('Error fetching data from Postgres:', error);
-      }
-    };
-
-    const processData = (data) => {
-      const processedData = data.map(item => ({
-        ...item,
-        timestamp: new Date(item.timestamp).toISOString(), // Use ISO string for timestamp
-      }));
-
-      setChartData((prevChartData) => {
-        const updatedData = [...processedData];
-        localStorage.setItem('chartData', JSON.stringify(updatedData));
-        return updatedData;
-      });
-    };
-
-    fetchData();
-  }, []);
-
   return (
     <div className={styles['operating-environment']}>
       <h3 className={styles['matrix-heading']}>Operating Environment by Machine</h3>
-      {['Machine_1', 'Machine_2', 'Machine_3', 'Machine_4', 'Machine_5'].map((machine) => (
-        <MachineChart
-          key={machine}
-          machineName={machine}
-          data={chartData}
-          filters={filters[machine]}
-          onFilterChange={handleFilterChange}
-          displayOption={displayOptions[machine]}
-          onDisplayOptionChange={handleDisplayOptionChange}
-        />
-      ))}
+      <MachineChart
+        machineName="Machine_1"
+        filters={filters.Machine_1}
+        onFilterChange={handleFilterChange}
+        displayOption={displayOptions.Machine_1}
+        onDisplayOptionChange={handleDisplayOptionChange}
+      />
+      <MachineChart
+        machineName="Machine_2"
+        filters={filters.Machine_2}
+        onFilterChange={handleFilterChange}
+        displayOption={displayOptions.Machine_2}
+        onDisplayOptionChange={handleDisplayOptionChange}
+      />
+      <MachineChart
+        machineName="Machine_3"
+        filters={filters.Machine_3}
+        onFilterChange={handleFilterChange}
+        displayOption={displayOptions.Machine_3}
+        onDisplayOptionChange={handleDisplayOptionChange}
+      />
+      <MachineChart
+        machineName="Machine_4"
+        filters={filters.Machine_4}
+        onFilterChange={handleFilterChange}
+        displayOption={displayOptions.Machine_4}
+        onDisplayOptionChange={handleDisplayOptionChange}
+      />
+      <MachineChart
+        machineName="Machine_5"
+        filters={filters.Machine_5}
+        onFilterChange={handleFilterChange}
+        displayOption={displayOptions.Machine_5}
+        onDisplayOptionChange={handleDisplayOptionChange}
+      />
     </div>
   );
 };
