@@ -69,6 +69,9 @@ const MachineChart = ({ machineName, filters, onFilterChange, displayOption, onD
     };
 
     fetchData();
+    const intervalId = setInterval(fetchData, 10000); // Fetch data every 10 seconds
+
+    return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, [machineName]);
 
   const filterData = () => {
