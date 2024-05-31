@@ -38,7 +38,7 @@ const FactoryLayout = () => {
     } else {
       fetchData(); // Initial fetch if no data in local storage
     }
-    const intervalId = setInterval(fetchData, 3600000); // Fetch every 5 seconds
+    const intervalId = setInterval(fetchData, 300000); // Fetch every 5 seconds
 
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, []);
