@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/factory-predictive-maintenance-v1/static/css/main.f56bc663.css",
-    "main.js": "/factory-predictive-maintenance-v1/static/js/main.fe31059e.js",
-    "static/js/453.a4c4aa0d.chunk.js": "/factory-predictive-maintenance-v1/static/js/453.a4c4aa0d.chunk.js",
+    "main.css": "/factory-predictive-maintenance-v1/static/css/main.26f2e47e.css",
+    "main.js": "/factory-predictive-maintenance-v1/static/js/main.eaee85ba.js",
+    "static/js/453.5b8e7dc6.chunk.js": "/factory-predictive-maintenance-v1/static/js/453.5b8e7dc6.chunk.js",
     "static/media/Thai_Summit_Group_Logo.svg.png": "/factory-predictive-maintenance-v1/static/media/Thai_Summit_Group_Logo.svg.666a4b4a49fc32cde454.png",
     "index.html": "/factory-predictive-maintenance-v1/index.html",
-    "main.f56bc663.css.map": "/factory-predictive-maintenance-v1/static/css/main.f56bc663.css.map",
-    "main.fe31059e.js.map": "/factory-predictive-maintenance-v1/static/js/main.fe31059e.js.map",
-    "453.a4c4aa0d.chunk.js.map": "/factory-predictive-maintenance-v1/static/js/453.a4c4aa0d.chunk.js.map"
+    "main.26f2e47e.css.map": "/factory-predictive-maintenance-v1/static/css/main.26f2e47e.css.map",
+    "main.eaee85ba.js.map": "/factory-predictive-maintenance-v1/static/js/main.eaee85ba.js.map",
+    "453.5b8e7dc6.chunk.js.map": "/factory-predictive-maintenance-v1/static/js/453.5b8e7dc6.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f56bc663.css",
-    "static/js/main.fe31059e.js"
+    "static/css/main.26f2e47e.css",
+    "static/js/main.eaee85ba.js"
   ]
 }
