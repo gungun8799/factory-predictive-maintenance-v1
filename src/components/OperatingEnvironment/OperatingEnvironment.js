@@ -1,279 +1,207 @@
 import React, { useEffect, useState } from 'react';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Brush,
-} from 'recharts';
-import styles from './OperatingEnvironment.module.css'; // Import CSS module
-import { format, subMinutes, subHours, subDays, subWeeks, subMonths, isValid } from 'date-fns';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import moment from 'moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import styles from './OperatingEnvironment.module.css';
 
-const formatData = (data, displayOption) => {
-  switch (displayOption) {
-    case 'minute':
-      return data.filter((entry) => new Date(entry.timestamp) >= subMinutes(new Date(), 60));
-    case 'hourly':
-      return data.filter((entry) => new Date(entry.timestamp) >= subHours(new Date(), 24));
-    case 'daily':
-      return data.filter((entry) => new Date(entry.timestamp) >= subDays(new Date(), 7));
-    case 'weekly':
-      return data.filter((entry) => new Date(entry.timestamp) >= subWeeks(new Date(), 4));
-    case 'monthly':
-      return data.filter((entry) => new Date(entry.timestamp) >= subMonths(new Date(), 12));
-    default:
-      return data;
-  }
-};
+const OperatingEnvironment = () => {
+  const getInitialDisplayModes = () => {
+    const savedDisplayModes = localStorage.getItem('displayModes');
+    return savedDisplayModes ? JSON.parse(savedDisplayModes) : {
+      Machine_1: 'minute',
+      Machine_2: 'minute',
+      Machine_3: 'minute',
+      Machine_4: 'minute',
+      Machine_5: 'minute',
+    };
+  };
 
-const MachineChart = ({ machineName, filters, onFilterChange, displayOption, onDisplayOptionChange }) => {
-  const [data, setData] = useState([]);
+  const getInitialStartDate = () => {
+    const savedStartDate = localStorage.getItem('startDate');
+    return savedStartDate ? new Date(savedStartDate) : moment().subtract(1, 'week').toDate();
+  };
+
+  const getInitialEndDate = () => {
+    const savedEndDate = localStorage.getItem('endDate');
+    return savedEndDate ? new Date(savedEndDate) : new Date();
+  };
+
+  const [chartData, setChartData] = useState([]);
+  const [displayModes, setDisplayModes] = useState(getInitialDisplayModes);
+  const [startDate, setStartDate] = useState(getInitialStartDate);
+  const [endDate, setEndDate] = useState(getInitialEndDate);
+
+  useEffect(() => {
+    localStorage.setItem('displayModes', JSON.stringify(displayModes));
+  }, [displayModes]);
+
+  useEffect(() => {
+    localStorage.setItem('startDate', startDate.toISOString());
+  }, [startDate]);
+
+  useEffect(() => {
+    localStorage.setItem('endDate', endDate.toISOString());
+  }, [endDate]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`https://harveypredictive.work.gd:8080/data/${machineName}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const response = await fetch('https://harveypredictive.work.gd:8080/data/');
         const result = await response.json();
         if (result.status === 'success' && Array.isArray(result.data)) {
-          processData(result.data);
+          console.log('Fetched data:', result.data);
+          setChartData(result.data);
         } else {
-          console.error('Error: Data fetched is not an array or status is not success:', result);
+          console.error('Error: Data fetched is not an array:', result);
         }
       } catch (error) {
-        console.error('Error fetching data from Postgres:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    const processData = (data) => {
-      const processedData = data.map(item => ({
-        ...item,
-        timestamp: new Date(item.timestamp).toLocaleString('en-US', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: false,
-        }),
-      }));
-
-      setData(processedData);
-    };
-
     fetchData();
-    const intervalId = setInterval(fetchData, 10000); // Fetch data every 10 seconds
+  }, []);
 
-    return () => clearInterval(intervalId); // Cleanup interval on component unmount
-  }, [machineName]);
+  const filterDataByMachineAndMode = (machineName, mode) => {
+    const filteredData = chartData.filter(entry => 
+      entry.machine === machineName && 
+      moment(entry.timestamp).isBetween(startDate, endDate, null, '[]')
+    );
+    console.log(`Filtered data for ${machineName}:`, filteredData);
 
-  const filterData = () => {
-    const { startDate, endDate } = filters;
-    let filteredData = data.filter((entry) => {
-      const entryTime = new Date(entry.timestamp).getTime();
-      const startTime = startDate ? new Date(startDate).getTime() : null;
-      const endTime = endDate ? new Date(endDate).getTime() : null;
+    let formattedData;
+    switch (mode) {
+      case 'hour':
+        formattedData = aggregateData(filteredData, 'hour');
+        break;
+      case 'day':
+        formattedData = aggregateData(filteredData, 'day');
+        break;
+      case 'week':
+        formattedData = aggregateData(filteredData, 'week');
+        break;
+      default:
+        formattedData = aggregateData(filteredData, 'minute');
+        break;
+    }
 
-      return (!startTime || entryTime >= startTime) && (!endTime || entryTime <= endTime);
-    });
-
-    return formatData(filteredData, displayOption);
+    return formattedData;
   };
 
-  const filteredData = filterData();
+  const aggregateData = (data, period) => {
+    const aggregatedData = {};
 
-  const formatXAxis = (tickItem) => {
-    const date = new Date(tickItem);
-    if (!isValid(date)) return ''; // Return empty string if the date is invalid
+    data.forEach(item => {
+      const key = moment(item.timestamp).startOf(period).format();
+      if (!aggregatedData[key]) {
+        aggregatedData[key] = {
+          timestamp: key,
+          vibration: 0,
+          temperature: 0,
+          noise_frequency: 0,
+          count: 0
+        };
+      }
+      aggregatedData[key].vibration += item.vibration;
+      aggregatedData[key].temperature += item.temperature;
+      aggregatedData[key].noise_frequency += item.noise_frequency;
+      aggregatedData[key].count += 1;
+    });
 
-    switch (displayOption) {
-      case 'minute':
-        return format(date, 'HH:mm');
-      case 'hourly':
-        return format(date, 'dd/MM HH:mm');
-      case 'daily':
-        return format(date, 'dd/MM');
-      case 'weekly':
-        return format(date, 'dd/MM');
-      case 'monthly':
-        return format(date, 'MMM yyyy');
+    return Object.values(aggregatedData).map(item => ({
+      ...item,
+      vibration: item.vibration / item.count,
+      temperature: item.temperature / item.count,
+      noise_frequency: item.noise_frequency / item.count,
+    })).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  };
+
+  const handleDisplayModeChange = (machineName, mode) => {
+    setDisplayModes((prevModes) => ({ ...prevModes, [machineName]: mode }));
+  };
+
+  const formatXAxis = (timestamp, mode) => {
+    const date = moment(timestamp);
+    if (!date.isValid()) return '';
+
+    switch (mode) {
+      case 'hour':
+        return date.format('HH:mm');
+      case 'day':
+        return date.format('MMM DD');
+      case 'week':
+        return date.format('MMM DD');
       default:
-        return tickItem;
+        return date.format('HH:mm:ss');
     }
   };
 
   return (
-    <div className={styles['machine-chart-wrapper-2']}>
-      <div className={styles['filter-container-2']}>
-        <label>
-          Start Date:
-          <input
-            type="datetime-local"
-            value={filters.startDate}
-            onChange={(e) => onFilterChange(machineName, 'startDate', e.target.value)}
-          />
-        </label>
-        <label>
-          End Date:
-          <input
-            type="datetime-local"
-            value={filters.endDate}
-            onChange={(e) => onFilterChange(machineName, 'endDate', e.target.value)}
-          />
-        </label>
+    <div>
+      <h3>Operating Environment by Machine</h3>
+      <div>
+        <div className={styles.datePickers}>
+          <label>
+            Start Date:
+            <DatePicker 
+              selected={startDate} 
+              onChange={date => setStartDate(date)} 
+              showTimeSelect
+              dateFormat="Pp"
+            />
+          </label>
+          <label>
+            End Date:
+            <DatePicker 
+              selected={endDate} 
+              onChange={date => setEndDate(date)} 
+              showTimeSelect
+              dateFormat="Pp"
+            />
+          </label>
+        </div>
+        {['Machine_1', 'Machine_2', 'Machine_3', 'Machine_4', 'Machine_5'].map(machine => (
+          <div key={machine}>
+            <div className={styles.machineButton}>{machine}</div>
+            <label className={styles.displayModeLabel}>
+              Display Mode: 
+              <select
+                value={displayModes[machine]}
+                onChange={(e) => handleDisplayModeChange(machine, e.target.value)}
+              > 
+                <option value="minute">Minute</option>
+                <option value="hour">Hour</option>
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+              </select>
+            </label>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart
+                data={filterDataByMachineAndMode(machine, displayModes[machine])}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="timestamp" 
+                  tickFormatter={(tick) => formatXAxis(tick, displayModes[machine])}
+                  interval={0}
+                  angle={-45}
+                  textAnchor="end"
+                  domain={[startDate.getTime(), endDate.getTime()]}
+                />
+                <YAxis yAxisId="left" />
+                <YAxis yAxisId="right" orientation="right" domain={[0, 1]} />
+                <Tooltip />
+                <Legend />
+                <Line yAxisId="right" type="monotone" dataKey="vibration" stroke="#8884d8" />
+                <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#82ca9d" />
+                <Line yAxisId="left" type="monotone" dataKey="noise_frequency" stroke="#ffc658" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        ))}
       </div>
-      <div className={styles['dropdown-container']}>
-        <label htmlFor={`${machineName}-display-option`}>Display: </label>
-        <select
-          id={`${machineName}-display-option`}
-          value={displayOption}
-          onChange={(e) => onDisplayOptionChange(machineName, e.target.value)}
-        >
-          <option value="minute">Minute</option>
-          <option value="hourly">Hourly</option>
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-        </select>
-      </div>
-      <h4>{machineName}</h4>
-      <ResponsiveContainer width="100%" height={350}>
-        <LineChart data={filteredData} margin={{ top: 50, right: 0, left: 0, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="timestamp"
-            tickFormatter={formatXAxis}
-            domain={['auto', 'auto']}
-          />
-          <YAxis yAxisId="left" stroke="#8884d8" />
-          <YAxis yAxisId="middle" orientation="right" stroke="#82ca9d" />
-          <YAxis yAxisId="right" orientation="right" stroke="#ffc658" offset={80} />
-          <Tooltip />
-          <Legend />
-          <Brush dataKey="timestamp" height={30} stroke="#8884d8" />
-          <Line
-            yAxisId="left"
-            type="monotone"
-            dataKey="vibration"
-            stroke="#8884d8"
-            name="Average Vibration"
-            dot={false}
-          />
-          <Line
-            yAxisId="middle"
-            type="monotone"
-            dataKey="temperature"
-            stroke="#82ca9d"
-            name="Average Temperature"
-            dot={false}
-          />
-          <Line
-            yAxisId="right"
-            type="monotone"
-            dataKey="noise_frequency"
-            stroke="#ffc658"
-            name="Average Noise Frequency"
-            dot={false}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
-};
-
-const OperatingEnvironment = () => {
-  const [filters, setFilters] = useState(() => {
-    const savedFilters = localStorage.getItem('filters');
-    return savedFilters ? JSON.parse(savedFilters) : {
-      Machine_1: { startDate: '', endDate: '' },
-      Machine_2: { startDate: '', endDate: '' },
-      Machine_3: { startDate: '', endDate: '' },
-      Machine_4: { startDate: '', endDate: '' },
-      Machine_5: { startDate: '', endDate: '' },
-    };
-  });
-
-  const [displayOptions, setDisplayOptions] = useState(() => {
-    const savedDisplayOptions = localStorage.getItem('displayOptions');
-    return savedDisplayOptions ? JSON.parse(savedDisplayOptions) : {
-      Machine_1: 'hourly',
-      Machine_2: 'hourly',
-      Machine_3: 'hourly',
-      Machine_4: 'hourly',
-      Machine_5: 'hourly',
-    };
-  });
-
-  const handleFilterChange = (machineName, type, value) => {
-    setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        [machineName]: {
-          ...prevFilters[machineName],
-          [type]: value,
-        },
-      };
-      localStorage.setItem('filters', JSON.stringify(newFilters)); // Save filters to localStorage
-      return newFilters;
-    });
-  };
-
-  const handleDisplayOptionChange = (machineName, value) => {
-    setDisplayOptions((prevOptions) => {
-      const newDisplayOptions = {
-        ...prevOptions,
-        [machineName]: value,
-      };
-      localStorage.setItem('displayOptions', JSON.stringify(newDisplayOptions)); // Save display options to localStorage
-      return newDisplayOptions;
-    });
-  };
-
-  return (
-    <div className={styles['operating-environment']}>
-      <h3 className={styles['matrix-heading']}>Operating Environment by Machine</h3>
-      <MachineChart
-        machineName="Machine_1"
-        filters={filters.Machine_1}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_1}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
-      <MachineChart
-        machineName="Machine_2"
-        filters={filters.Machine_2}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_2}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
-      <MachineChart
-        machineName="Machine_3"
-        filters={filters.Machine_3}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_3}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
-      <MachineChart
-        machineName="Machine_4"
-        filters={filters.Machine_4}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_4}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
-      <MachineChart
-        machineName="Machine_5"
-        filters={filters.Machine_5}
-        onFilterChange={handleFilterChange}
-        displayOption={displayOptions.Machine_5}
-        onDisplayOptionChange={handleDisplayOptionChange}
-      />
     </div>
   );
 };

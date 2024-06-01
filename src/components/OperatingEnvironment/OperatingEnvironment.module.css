@@ -2,57 +2,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px; /* Added to give space between each chart */
-  overflow-x: auto; /* Enable horizontal scrolling */
 }
 
 .matrix-heading {
   margin-bottom: 20px;
 }
 
-.machine-chart-wrapper-2 {
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+.machine-chart-wrapper {
   width: 100%;
-  max-width: 800px;
-  margin-bottom: 20px;
-  position: relative;
-  z-index: 10;
+  margin-bottom: 40px;
 }
 
-.filter-container-2 {
+.filter-container {
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: center;
   margin-bottom: 10px;
-  font-size: 12px;
-  padding: 10px;
-  background: #f9f9f9;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.filter-container-2 label {
-  display: flex;
-  flex-direction: column;
-  font-size: 12px;
-  color: #333;
-  flex: 1;
-}
-
-.filter-container-2 input {
-  font-size: 12px;
-  padding: 5px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-}
-
-.machine-chart-2 h4 {
-  text-align: center;
-  margin-bottom: 20px;
 }
 
 .dropdown-container {
@@ -61,12 +25,36 @@
   margin-bottom: 10px;
 }
 
-.dropdown-container label {
-  margin-right: 10px;
+.machine-chart-wrapper h4 {
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-.dropdown-container select {
-  padding: 5px;
+.machineButton {
+  display: inline-block;
+  font-size: 20px;
+  padding: 5px 10px;
+  margin: 5px;
+  margin-top: 10px;
   border-radius: 5px;
-  border: 1px solid #ccc;
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.displayModeLabel {
+  display: block;
+  margin-bottom: 10px;
+}
+
+
+.datePickers {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.datePickers label {
+  margin-right: 10px;
 }
