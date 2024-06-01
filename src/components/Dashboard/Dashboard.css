@@ -1,7 +1,6 @@
 .dashboard {
   padding: 10px;
-  flex-grow: 1;
-  max-width: 500px; /* Set a maximum width for the dashboard */
+  max-width: 1200px; /* Set a maximum width for the dashboard */
   margin: 0 auto; /* Center the dashboard */
 }
 
@@ -19,12 +18,10 @@
   font-size: 28px;
 }
 
-
-
 .dashboard-content {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Adjust to 2 columns to fit within the max-width */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjust to fit within the max-width */
   grid-gap: 20px;
-  justify-content: center; /* Center the grid content */
-  margin-right: 10px;
+  justify-items: center; /* Center the grid items */
+  margin: 0 auto; /* Center the grid content */
 }

@@ -1,10 +1,14 @@
 .real-time-RT {
+  display: flex;
+  flex-direction: column; /* Align children in a column */
   background: white;
   padding: 15px; /* Reduced padding */
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  margin-right: 60px;
   height: 395px;
+  width: 500px;
+  left: 120px;
+  position: relative;
 }
 
 .real-time-RT h3 {
@@ -39,7 +43,7 @@
 }
 
 .gauge {
-  width: 24%; /* Adjusted width for smaller gauge bars */
+  width: 21%; /* Adjusted width for smaller gauge bars */
   text-align: center;
   margin-right: 0; /* Add margin to control spacing between gauges */
   display: flex; /* Added flex display */

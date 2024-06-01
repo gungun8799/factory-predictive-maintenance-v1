@@ -1,11 +1,11 @@
 .static-matrix-SM {
   background: white;
   padding: 10px; /* Reduced padding */
-  margin-left: -10px;
+  margin-left: -40px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   height: 406.5px; /* Adjusted height */
-  width: 500px;
+  width: 480px;
   position: relative;
 }
 

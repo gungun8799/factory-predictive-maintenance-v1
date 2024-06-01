@@ -1,14 +1,14 @@
 .container-EC {
   display: flex;
   justify-content: flex-end; /* Move the card to the right */
-  padding-right: 10px; /* Adjust the padding as needed */
+  padding-right: 310px; /* Adjust the padding as needed */
   margin-left: 30px;
 }
 
 .equipment-condition {
   background: white;
   height: 386px; /* Adjusted height */
-  width: 400px; /* Adjusted width */
+  width: 430px; /* Adjusted width */
   padding: 20px; /* Reduced padding */
   padding-right: 1px; /* Reduced padding */
   border-radius: 10px;
