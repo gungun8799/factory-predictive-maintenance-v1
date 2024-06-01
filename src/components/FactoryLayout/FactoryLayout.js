@@ -38,7 +38,7 @@ const FactoryLayout = () => {
     } else {
       fetchData();
     }
-    const intervalId = setInterval(fetchData, 300000); // Fetch every 10 minutes
+    const intervalId = setInterval(fetchData, 10000); // Fetch every 5 minutes
 
     return () => clearInterval(intervalId);
   }, []);
